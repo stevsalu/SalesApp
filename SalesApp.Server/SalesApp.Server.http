@@ -1,0 +1,26 @@
+@SalesApp.Server_HostAddress = http://localhost:54348
+
+GET {{SalesApp.Server_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
+
+### Get all products
+GET {{SalesApp.Server_HostAddress}}/api/products
+
+### Add a new product
+POST {{SalesApp.Server_HostAddress}}/api/products
+Content-Type: application/json
+
+{
+  "name": "Test Item",
+  "price": 2.99,
+  "quantity": 10,
+  "category": "Edible"
+}
+
+### Get one product by ID (replace with actual ID)
+GET{{SalesApp.Server_HostAddress}}/api/products/{{productId}}
+
+### Delete a product by ID
+DELETE {{SalesApp.Server_HostAddress}}/api/products/{{productId}}
