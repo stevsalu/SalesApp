@@ -16,11 +16,71 @@ Content-Type: application/json
   "name": "Test Item",
   "price": 2.99,
   "quantity": 10,
-  "category": "Edible"
+  "categoryId": 1
 }
 
 ### Get one product by ID (replace with actual ID)
 GET{{SalesApp.Server_HostAddress}}/api/products/{{productId}}
 
+### Update a product by ID
+PUT {{SalesApp.Server_HostAddress}}/api/products/{{productId}}
+Content-Type: application/json
+
+{
+  "name": "Updated Item",
+  "price": 3.99,
+  "quantity": 5,
+  "categoryId": 2
+}
+
 ### Delete a product by ID
 DELETE {{SalesApp.Server_HostAddress}}/api/products/{{productId}}
+
+### Get all categories
+GET {{SalesApp.Server_HostAddress}}/api/categories
+
+### Perform a checkout with one product
+POST {{SalesApp.Server_HostAddress}}/api/checkout
+Content-Type: application/json
+
+{
+  "cashPaid": 10.00,
+  "items": [
+    {
+      "productId": "{{productId}}",
+      "quantity": 2
+    }
+  ]
+}
+
+### Perform a checkout with multiple products
+POST {{SalesApp.Server_HostAddress}}/api/checkout
+Content-Type: application/json
+
+{
+  "cashPaid": 20.00,
+  "items": [
+    {
+      "productId": "{{productId1}}",
+      "quantity": 2
+    },
+    {
+      "productId": "{{productId2}}",
+      "quantity": 1
+    }
+  ]
+}
+
+### Invalid checkout (insufficient payment)
+POST {{SalesApp.Server_HostAddress}}/api/checkout
+Content-Type: application/json
+
+{
+  "cashPaid": 1.00,
+  "items": [
+    {
+      "productId": "{{productId}}",
+      "quantity": 5
+    }
+  ]
+}

@@ -46,7 +46,7 @@ public class CheckoutService : ICheckoutService {
 
         return new CheckoutResult {
             IsSuccess = true,
-            TotalCost = total,
+            TotalCost = Math.Round(total, 2),
             ChangeReturned = Math.Round(request.AmountPaid - total, 2)
         };
     }

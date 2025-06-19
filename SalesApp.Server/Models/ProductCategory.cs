@@ -1,5 +1,9 @@
-﻿namespace SalesApp.Server.Models;
-public enum ProductCategory {
-    Edible,
-    Clothing
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace SalesApp.Server.Models;
+public class ProductCategory {
+    [Key]
+    public int Id { get; set; }
+    [Required]
+    public string Name { get; set; }
 }

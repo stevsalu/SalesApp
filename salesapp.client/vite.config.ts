@@ -16,6 +16,8 @@ const certificateName = "salesapp.client";
 const certFilePath = path.join(baseFolder, `${certificateName}.pem`);
 const keyFilePath = path.join(baseFolder, `${certificateName}.key`);
 
+process.env.NODE_EXTRA_CA_CERTS = certFilePath;
+
 if (!fs.existsSync(baseFolder)) {
     fs.mkdirSync(baseFolder, { recursive: true });
 }
@@ -47,8 +49,9 @@ export default defineConfig({
     },
     server: {
         proxy: {
-            '^/weatherforecast': {
+            "/api": {
                 target,
+                changeOrigin: true,
                 secure: false
             }
         },

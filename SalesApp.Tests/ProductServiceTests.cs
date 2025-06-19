@@ -24,10 +24,17 @@ public class ProductServiceTests {
             Name = "Test",
             Price = 1.23m,
             Quantity = 10,
-            Category = ProductCategory.Edible
+            CategoryId = 1
         };
 
-        var createdProduct = _mapper.Map<Product>(dto);
+        var createdProduct = new Product {
+            Id = Guid.NewGuid(),
+            Name = dto.Name,
+            Price = dto.Price,
+            Quantity = dto.Quantity,
+            CategoryId = dto.CategoryId,
+            Category = new ProductCategory { Id = dto.CategoryId, Name = "Edible" }
+        };
 
         _mockRepo.Setup(r => r.AddAsync(It.IsAny<Product>()))
                  .ReturnsAsync(createdProduct);
@@ -40,18 +47,30 @@ public class ProductServiceTests {
 
     [Fact]
     public async Task GetAllAsync_ShouldReturnAllProducts() {
-        var products = new List<Product>
-        {
-                new Product { Name = "A", Price = 1, Quantity = 1, Category = ProductCategory.Edible },
-                new Product { Name = "B", Price = 2, Quantity = 2, Category = ProductCategory.Clothing }
-            };
+        var products = new List<Product> {
+            new Product {
+                Name = "A",
+                Price = 1,
+                Quantity = 1,
+                CategoryId = 1,
+                Category = new ProductCategory { Id = 1, Name = "Edible" }
+            },
+            new Product
+            {
+                Name = "B",
+                Price = 2,
+                Quantity = 2,
+                CategoryId = 2,
+                Category = new ProductCategory { Id = 2, Name = "Clothing" }
+            }
+        };
 
         _mockRepo.Setup(r => r.GetAllAsync())
                  .ReturnsAsync(products);
 
         var result = await _service.GetAllAsync();
 
-        Assert.Equal(2, ((List<Product>)result).Count);
+        Assert.Equal(2, ((List<ProductDTO>)result).Count);
     }
 
     [Fact]
@@ -62,7 +81,8 @@ public class ProductServiceTests {
             Name = "Single",
             Price = 2.5m,
             Quantity = 10,
-            Category = ProductCategory.Edible
+            CategoryId = 1,
+            Category = new ProductCategory { Id = 1, Name = "Edible" }
         };
 
         _mockRepo.Setup(r => r.GetByIdAsync(id))
@@ -72,6 +92,7 @@ public class ProductServiceTests {
 
         Assert.NotNull(result);
         Assert.Equal(id, result!.Id);
+        Assert.Equal("Edible", result.CategoryName);
     }
 
     [Fact]
@@ -93,26 +114,26 @@ public class ProductServiceTests {
             Name = "Updated",
             Price = 2.5m,
             Quantity = 50,
-            Category = ProductCategory.Clothing
+            CategoryId = 2
         };
-
-        var product = _mapper.Map<Product>(dto);
 
         var updatedProduct = new Product {
             Id = id,
             Name = dto.Name,
             Price = dto.Price,
             Quantity = dto.Quantity,
-            Category = dto.Category
+            CategoryId = 2,
+            Category = new ProductCategory { Id = 2, Name = "Clothing" }
         };
 
-        _mockRepo.Setup(r => r.UpdateAsync(id, product))
+        _mockRepo.Setup(r => r.UpdateAsync(id, It.IsAny<Product>()))
                  .ReturnsAsync(updatedProduct);
 
         var result = await _service.UpdateAsync(id, dto);
 
         Assert.NotNull(result);
         Assert.Equal("Updated", result!.Name);
-        Assert.Equal(ProductCategory.Clothing, result.Category);
+        Assert.Equal(2, result.CategoryId);
+        Assert.Equal("Clothing", result.CategoryName);
     }
 }

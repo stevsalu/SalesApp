@@ -1,58 +1,69 @@
-import { useEffect, useState } from 'react';
-import './App.css';
+import React, { useEffect, useState } from "react";
+import ProductGrid from "./components/ProductGrid";
+import CartSummary from "./components/CartSummary";
+import CheckoutForm from "./components/CheckoutForm";
+import axios from "axios";
 
-interface Forecast {
-    date: string;
-    temperatureC: number;
-    temperatureF: number;
-    summary: string;
+export interface Product {
+    id: string;
+    name: string;
+    price: number;
+    quantity: number;
+    categoryId: number;
+    categoryName: string;
+}
+
+export interface CartItem {
+    productId: string;
+    name: string;
+    price: number;
+    quantity: number;
 }
 
 function App() {
-    const [forecasts, setForecasts] = useState<Forecast[]>();
+    const [products, setProducts] = useState<Product[]>([]);
+    const [cart, setCart] = useState<CartItem[]>([]);
 
     useEffect(() => {
-        populateWeatherData();
+        loadProducts();
     }, []);
 
-    const contents = forecasts === undefined
-        ? <p><em>Loading... Please refresh once the ASP.NET backend has started. See <a href="https://aka.ms/jspsintegrationreact">https://aka.ms/jspsintegrationreact</a> for more details.</em></p>
-        : <table className="table table-striped" aria-labelledby="tableLabel">
-            <thead>
-                <tr>
-                    <th>Date</th>
-                    <th>Temp. (C)</th>
-                    <th>Temp. (F)</th>
-                    <th>Summary</th>
-                </tr>
-            </thead>
-            <tbody>
-                {forecasts.map(forecast =>
-                    <tr key={forecast.date}>
-                        <td>{forecast.date}</td>
-                        <td>{forecast.temperatureC}</td>
-                        <td>{forecast.temperatureF}</td>
-                        <td>{forecast.summary}</td>
-                    </tr>
-                )}
-            </tbody>
-        </table>;
+    const loadProducts = async () => {
+        const response = await fetch("/api/products");
+        console.log(response.json());
+        //setProducts(response.data);
+    };
+
+    const addToCart = (product: Product) => {
+        setCart(prevCart => {
+            const existing = prevCart.find(item => item.productId === product.id);
+            if (existing) {
+                return prevCart.map(item =>
+                    item.productId === product.id
+                        ? { ...item, quantity: item.quantity + 1 }
+                        : item
+                );
+            } else {
+                return [...prevCart, { productId: product.id, name: product.name, price: product.price, quantity: 1 }];
+            }
+        });
+    };
+
+    const resetCart = () => {
+        setCart([]);
+    };
 
     return (
         <div>
-            <h1 id="tableLabel">Weather forecast</h1>
-            <p>This component demonstrates fetching data from the server.</p>
-            {contents}
+            <h1>Point of Sale</h1>
+            <ProductGrid products={products} addToCart={addToCart} />
+            <CartSummary cart={cart} resetCart={resetCart} />
+            <CheckoutForm cart={cart} onCheckoutSuccess={() => {
+                resetCart();
+                loadProducts();
+            }} />
         </div>
     );
-
-    async function populateWeatherData() {
-        const response = await fetch('api/product');
-        if (response.ok) {
-            const data = await response.json();
-            setForecasts(data);
-        }
-    }
 }
 
 export default App;

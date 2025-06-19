@@ -15,26 +15,26 @@ public class ProductService : IProductService {
         _mapper = mapper;
     }
 
-    public async Task<IEnumerable<Product>> GetAllAsync() {
+    public async Task<IEnumerable<ProductDTO>> GetAllAsync() {
         var products = await _productRepository.GetAllAsync();
-        return products;
+        return _mapper.Map<IEnumerable<ProductDTO>>(products);
     }
 
-    public async Task<Product?> GetAsync(Guid id) {
+    public async Task<ProductDTO?> GetAsync(Guid id) {
         var product = await _productRepository.GetByIdAsync(id);
-        return product is null ? null : product;
+        return product is null ? null : _mapper.Map<ProductDTO>(product);
     }
 
-    public async Task<Product> AddAsync(CreateProductDTO dto) {
+    public async Task<ProductDTO> AddAsync(CreateProductDTO dto) {
         var product = _mapper.Map<Product>(dto);
         var created = await _productRepository.AddAsync(product);
-        return created;
+        return _mapper.Map<ProductDTO>(created);
     }
 
-    public async Task<Product?> UpdateAsync(Guid id, UpdateProductDTO dto) {
+    public async Task<ProductDTO?> UpdateAsync(Guid id, UpdateProductDTO dto) {
         var productToUpdate = _mapper.Map<Product>(dto);
         var updated = await _productRepository.UpdateAsync(id, productToUpdate);
-        return updated == null ? null : updated;
+        return updated == null ? null : _mapper.Map<ProductDTO>(updated);
     }
 
     public async Task<bool> RemoveAsync(Guid id) {
