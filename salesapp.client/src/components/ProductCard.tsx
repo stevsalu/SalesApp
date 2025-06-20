@@ -17,21 +17,30 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, addToCart }) => {
 
     return (
         <div
-            onClick={handleClick}
+            className={`card text-center ${isOutOfStock ? "opacity-50" : "cursor-pointer"}`}
             style={{
-                width: "150px",
+                width: "200px",
                 margin: "10px",
-                opacity: isOutOfStock ? 0.5 : 1,
-                cursor: isOutOfStock ? "not-allowed" : "pointer",
-                border: "1px solid gray",
-                padding: "10px"
+                cursor: isOutOfStock ? "not-allowed" : "pointer"
             }}
+            onClick={handleClick}
         >
-            <img src={`/images/${product.name}.jpg`} alt={product.name} width="100%" />
-            <h3>{product.name}</h3>
-            <p>€{product.price.toFixed(2)}</p>
-            <p>In stock: {product.quantity}</p>
+            <img
+                src={`/images/${product.name.toLowerCase()}.jpg`}
+                alt={product.name}
+                className="card-img-top"
+                style={{
+                    objectFit: "cover",
+                    height: "150px"
+                }}
+            />
+            <div className="card-body d-flex flex-column justify-content-between">
+                <h5 className="card-title">{product.name}</h5>
+                <p className="card-text">{"\u20AC"}{product.price.toFixed(2)}</p>
+                <p className="card-text">In stock: {product.quantity}</p>
+            </div>
         </div>
+
     );
 };
 

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import type { CartItem } from "../App";
+import { toast } from "react-toastify";
 
 interface CheckoutFormProps {
     cart: CartItem[];
@@ -8,12 +9,12 @@ interface CheckoutFormProps {
 }
 
 const CheckoutForm: React.FC<CheckoutFormProps> = ({ cart, onCheckoutSuccess }) => {
-    const [cashPaid, setCashPaid] = useState<string>("");
+    const [amountPaid, setAmountPaid] = useState<string>("");
     const [message, setMessage] = useState<string>("");
 
     const handleCheckout = async () => {
         const payload = {
-            cashPaid: parseFloat(cashPaid),
+            amountPaid: parseFloat(amountPaid),
             items: cart.map(item => ({
                 productId: item.productId,
                 quantity: item.quantity
@@ -23,28 +24,31 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({ cart, onCheckoutSuccess }) 
         try {
             const response = await axios.post("/api/checkout", payload);
             const result = response.data;
-            setMessage(`Change to return: €${result.changeReturned.toFixed(2)}`);
+            toast.success(`Checkout successful! Change to return: ${"\u20AC"}${result.changeReturned.toFixed(2)}`);
+            setMessage(`Change to return: ${ "\u20AC" }${ result.changeReturned.toFixed(2) }`)
             onCheckoutSuccess();
         } catch (error: any) {
             if (error.response?.data?.errorMessage) {
-                setMessage(`Error: ${error.response.data.errorMessage}`);
+                toast.error(`Error: ${error.response.data.errorMessage}`);
             } else {
-                setMessage("Error during checkout.");
+                toast.error("Error during checkout.");
             }
         }
     };
 
     return (
-        <div style={{ marginTop: "20px" }}>
+        <div className="card p-3">
             <h2>Checkout</h2>
             <input
                 type="number"
+                className="form-control mb-2"
                 placeholder="Cash paid"
-                value={cashPaid}
-                onChange={(e) => setCashPaid(e.target.value)}
+                value={amountPaid}
+                onChange={(e) => setAmountPaid(e.target.value)}
             />
-            <button onClick={handleCheckout}>Checkout</button>
-            {message && <p>{message}</p>}
+            <button onClick={handleCheckout} className="btn btn-success">
+                Checkout
+            </button>
         </div>
     );
 };

@@ -9,7 +9,7 @@ interface ProductGridProps {
 
 const ProductGrid: React.FC<ProductGridProps> = ({ products, addToCart }) => {
     return (
-        <div style={{ display: "flex", flexWrap: "wrap" }}>
+        <div className="d-flex flex-wrap justify-content-start">
             {products.map(product => (
                 <ProductCard key={product.id} product={product} addToCart={addToCart} />
             ))}
