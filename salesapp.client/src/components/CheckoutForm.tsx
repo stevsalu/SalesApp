@@ -49,6 +49,7 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({ cart, onCheckoutSuccess }) 
             <button onClick={handleCheckout} className="btn btn-success">
                 Checkout
             </button>
+            {message && <p>{message}</p>}
         </div>
     );
 };

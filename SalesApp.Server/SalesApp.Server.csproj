@@ -2,6 +2,8 @@
 
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
+	<EnableMinimalApi>true</EnableMinimalApi>
+	<OutputType>Exe</OutputType>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UserSecretsId>e2edbb7a-d04f-478b-be51-1aa9d61a17a3</UserSecretsId>

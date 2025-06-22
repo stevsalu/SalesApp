@@ -32,18 +32,16 @@ var app = builder.Build();
 app.UseDefaultFiles();
 app.MapStaticAssets();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.MapOpenApi();
+app.MapOpenApi();
 
-    app.UseSwaggerUI(options => {
-        options.SwaggerEndpoint("/openapi/v1.json", "Sales API V1");
-        options.RoutePrefix = "swagger";
-    });
+app.UseSwaggerUI(options => {
+    options.SwaggerEndpoint("/openapi/v1.json", "Sales API V1");
+    options.RoutePrefix = "swagger";
+});
+
+if (!app.Environment.IsDevelopment()) {
+    app.UseHttpsRedirection();
 }
-
-app.UseHttpsRedirection();
 
 app.UseAuthorization();
 

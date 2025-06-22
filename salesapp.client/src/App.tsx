@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import ProductGrid from "./components/ProductGrid";
 import CartSummary from "./components/CartSummary";
 import CheckoutForm from "./components/CheckoutForm";
 import axios from "axios";
-import { ToastContainer, toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import AdminPanel from "./components/AdminPanel";
 
