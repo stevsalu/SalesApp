@@ -39,6 +39,9 @@ Database seeding for demo items
 ```bash
 docker compose -f docker-compose.full.yml up --build
 ```
+First time run might not launch server so from docker just start it again.
+- Access swagger from http://localhost:8080/swagger
+- Access the app from http://localhost:5173/
 
 ### Local Development with Visual Studio
 Navigate to the repo folder and run
