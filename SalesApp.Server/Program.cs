@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using SalesApp.Server;
 using SalesApp.Server.Data;
+using SalesApp.Server.Hubs;
 using SalesApp.Server.Repositories;
 using SalesApp.Server.Services;
 using System.Text.Json.Serialization;
@@ -27,6 +28,8 @@ builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 
+builder.Services.AddSignalR();
+
 var app = builder.Build();
 
 app.UseDefaultFiles();
@@ -42,6 +45,8 @@ app.UseSwaggerUI(options => {
 if (!app.Environment.IsDevelopment()) {
     app.UseHttpsRedirection();
 }
+
+app.MapHub<ProductHub>("/hubs/products");
 
 app.UseAuthorization();
 

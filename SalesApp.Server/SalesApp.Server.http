@@ -84,3 +84,12 @@ Content-Type: application/json
     }
   ]
 }
+
+### Reserve item in cart
+POST {{SalesApp.Server_HostAddress}}/api/cart/reserve
+Content-Type: application/json
+
+{
+    "productId": "{{productId}}",
+    "quantity": 1
+}

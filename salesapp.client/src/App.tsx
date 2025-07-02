@@ -6,6 +6,7 @@ import axios from "axios";
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import AdminPanel from "./components/AdminPanel";
+import useProductHub from "./hooks/ProductHub";
 
 export interface Product {
     id: string;
@@ -41,7 +42,7 @@ function App() {
         }
     };
 
-    const addToCart = (product: Product) => {
+    const addToCart = async (product: Product) => {
         setCart(prevCart => {
             const existing = prevCart.find(item => item.productId === product.id);
             if (existing) {
@@ -53,6 +54,11 @@ function App() {
             } else {
                 return [...prevCart, { productId: product.id, name: product.name, price: product.price, quantity: 1 }];
             }
+        });
+
+        await axios.post("/api/cart/reserve", {
+            productId: product.id,
+            quantity: 1
         });
     };
 
@@ -66,6 +72,16 @@ function App() {
         }
         setShowAdmin(!showAdmin);
     };
+
+    const handleProductUpdated = (updatedProduct: Product) => {
+        setProducts((prev) =>
+            prev.map((p) => (p.id === updatedProduct.id ? updatedProduct : p))
+        );
+    };
+
+    useProductHub({
+        onProductUpdated: handleProductUpdated,
+    });
 
     return (
         <div className="container mt-4">

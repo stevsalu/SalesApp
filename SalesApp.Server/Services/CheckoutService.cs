@@ -1,13 +1,21 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.SignalR;
+using Microsoft.EntityFrameworkCore;
 using SalesApp.Server.Data;
 using SalesApp.Server.DTOs;
+using SalesApp.Server.Hubs;
+using SalesApp.Server.Models;
 
 namespace SalesApp.Server.Services;
 public class CheckoutService : ICheckoutService {
     private readonly AppDbContext _context;
+    private readonly IMapper _mapper;
+    private readonly IHubContext<ProductHub> _hub;
 
-    public CheckoutService(AppDbContext context) {
+    public CheckoutService(AppDbContext context, IMapper mapper, IHubContext<ProductHub> hubContext) {
         _context = context;
+        _mapper = mapper;
+        _hub = hubContext;
     }
 
     public async Task<CheckoutResult> ProcessAsync(CheckoutRequest request) {
@@ -16,6 +24,7 @@ public class CheckoutService : ICheckoutService {
         var productIds = request.Items.Select(i => i.ProductId).ToList();
         var products = await _context.Products
             .Where(p => productIds.Contains(p.Id))
+            .Include(p => p.Category)
             .ToListAsync();
 
         decimal total = 0;
@@ -44,10 +53,20 @@ public class CheckoutService : ICheckoutService {
         await _context.SaveChangesAsync();
         await transaction.CommitAsync();
 
+        foreach (var product in products) {
+            await SendHubMessage(product);
+        }
+
         return new CheckoutResult {
             IsSuccess = true,
             TotalCost = Math.Round(total, 2),
             ChangeReturned = Math.Round(request.AmountPaid - total, 2)
         };
+    }
+
+    private async Task SendHubMessage(Product product) {
+        var updateProduct = _mapper.Map<ProductDTO>(product);
+
+        await _hub.Clients.All.SendAsync("ProductUpdated", updateProduct);
     }
 }

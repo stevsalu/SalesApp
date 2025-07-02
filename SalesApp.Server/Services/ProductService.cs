@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.SignalR;
 using SalesApp.Server.DTOs;
+using SalesApp.Server.Hubs;
 using SalesApp.Server.Models;
 using SalesApp.Server.Repositories;
 using System.Collections.Concurrent;
@@ -9,10 +11,13 @@ public class ProductService : IProductService {
 
     private readonly IProductRepository _productRepository;
     private readonly IMapper _mapper;
+    private readonly IHubContext<ProductHub> _hub;
 
-    public ProductService(IProductRepository productRepository, IMapper mapper) {
+    public ProductService(IProductRepository productRepository, IMapper mapper, IHubContext<ProductHub> hubContext) {
         _productRepository = productRepository;
         _mapper = mapper;
+        _hub = hubContext;
+
     }
 
     public async Task<IEnumerable<ProductDTO>> GetAllAsync() {
@@ -34,7 +39,13 @@ public class ProductService : IProductService {
     public async Task<ProductDTO?> UpdateAsync(Guid id, UpdateProductDTO dto) {
         var productToUpdate = _mapper.Map<Product>(dto);
         var updated = await _productRepository.UpdateAsync(id, productToUpdate);
-        return updated == null ? null : _mapper.Map<ProductDTO>(updated);
+
+        if (updated == null) return null;
+
+        var product = _mapper.Map<ProductDTO>(updated);
+        await _hub.Clients.All.SendAsync("ProductUpdated", product);
+
+        return product;
     }
 
     public async Task<bool> RemoveAsync(Guid id) {
