@@ -10,12 +10,12 @@ namespace SalesApp.Server.Services;
 public class CheckoutService : ICheckoutService {
     private readonly AppDbContext _context;
     private readonly IMapper _mapper;
-    private readonly IHubContext<ProductHub> _hub;
+    private readonly IProductNotifier _notifier;
 
-    public CheckoutService(AppDbContext context, IMapper mapper, IHubContext<ProductHub> hubContext) {
+    public CheckoutService(AppDbContext context, IMapper mapper, IProductNotifier notifier) {
         _context = context;
         _mapper = mapper;
-        _hub = hubContext;
+        _notifier = notifier;
     }
 
     public async Task<CheckoutResult> ProcessAsync(CheckoutRequest request) {
@@ -54,7 +54,8 @@ public class CheckoutService : ICheckoutService {
         await transaction.CommitAsync();
 
         foreach (var product in products) {
-            await SendHubMessage(product);
+            var updateProduct = _mapper.Map<ProductDTO>(product);
+            await _notifier.NotifyProductUpdated(updateProduct);
         }
 
         return new CheckoutResult {
@@ -64,9 +65,4 @@ public class CheckoutService : ICheckoutService {
         };
     }
 
-    private async Task SendHubMessage(Product product) {
-        var updateProduct = _mapper.Map<ProductDTO>(product);
-
-        await _hub.Clients.All.SendAsync("ProductUpdated", updateProduct);
-    }
 }

@@ -11,12 +11,12 @@ public class ProductService : IProductService {
 
     private readonly IProductRepository _productRepository;
     private readonly IMapper _mapper;
-    private readonly IHubContext<ProductHub> _hub;
+    private readonly IProductNotifier _notifier;
 
-    public ProductService(IProductRepository productRepository, IMapper mapper, IHubContext<ProductHub> hubContext) {
+    public ProductService(IProductRepository productRepository, IMapper mapper, IProductNotifier notifier) {
         _productRepository = productRepository;
         _mapper = mapper;
-        _hub = hubContext;
+        _notifier = notifier;
 
     }
 
@@ -43,7 +43,8 @@ public class ProductService : IProductService {
         if (updated == null) return null;
 
         var product = _mapper.Map<ProductDTO>(updated);
-        await _hub.Clients.All.SendAsync("ProductUpdated", product);
+
+        await _notifier.NotifyProductUpdated(product);
 
         return product;
     }

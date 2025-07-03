@@ -56,6 +56,8 @@ function App() {
             }
         });
 
+        setProducts((prev) => decreaseProductQuantity(prev, product.id, 1));
+
         await axios.post("/api/cart/reserve", {
             productId: product.id,
             quantity: 1
@@ -73,14 +75,30 @@ function App() {
         setShowAdmin(!showAdmin);
     };
 
+    const decreaseProductQuantity = (
+        products: Product[],
+        productId: string,
+        quantityToDecrease: number
+    ): Product[] => {
+        return products.map((p) =>
+            p.id === productId ? { ...p, quantity: p.quantity - quantityToDecrease } : p
+        );
+    };
+
     const handleProductUpdated = (updatedProduct: Product) => {
         setProducts((prev) =>
             prev.map((p) => (p.id === updatedProduct.id ? updatedProduct : p))
         );
     };
 
+    const handleProductReserved = (id: string, quantity: number) => {
+        setProducts((prev) => decreaseProductQuantity(prev, id, quantity));
+
+    }
+
     useProductHub({
         onProductUpdated: handleProductUpdated,
+        onProductReserved: handleProductReserved
     });
 
     return (

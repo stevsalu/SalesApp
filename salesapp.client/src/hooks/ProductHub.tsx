@@ -4,9 +4,10 @@ import type { Product } from "../App";
 
 interface UseProductHubProps {
     onProductUpdated: (product: Product) => void;
+    onProductReserved: (id: string, quantity: number) => void;
 }
 
-export default function useProductHub({ onProductUpdated } : UseProductHubProps) {
+export default function useProductHub({ onProductUpdated, onProductReserved }: UseProductHubProps) {
     useEffect(() => {
         const connection = new signalR.HubConnectionBuilder()
             .withUrl("/hubs/products")
@@ -20,8 +21,13 @@ export default function useProductHub({ onProductUpdated } : UseProductHubProps)
             onProductUpdated(product);
         });
 
+        connection.on("ProductReserved", (data) => {
+            console.log("Product reserved:", data);
+            onProductReserved(data.productId, data.quantity);
+        });
+
         return () => {
             connection.stop();
         };
-    }, [onProductUpdated]);
+    }, [onProductUpdated, onProductReserved]);
 }

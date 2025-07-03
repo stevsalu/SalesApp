@@ -9,9 +9,17 @@ namespace SalesApp.Server.Controllers;
 public class CartController : ControllerBase {
     private readonly IHubContext<ProductHub> _hub;
 
+    public CartController(IHubContext<ProductHub> hub) {
+        _hub = hub;
+    }
+
     [HttpPost("reserve")]
     public async Task<IActionResult> Reserve([FromBody] ReserveItemRequest request) {
-        await _hub.Clients.All.SendAsync("ProductReserved");
+        // Would be nice to handle the cart logic in db aswell but this will do for a simple kiosk usage
+        await _hub.Clients.All.SendAsync("ProductReserved", new {
+        ProductId = request.ProductId,
+        Quantity = request.Quantity
+        });
         return Ok();
     }
 }
