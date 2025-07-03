@@ -6,6 +6,7 @@ Full-stack Sale Application
 Built with:
 
 - .NET 9
+- SignalR
 - React + Vite (TypeScript)
 - PostgreSQL 15
 - NGINX
